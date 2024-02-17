@@ -4,7 +4,7 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 ## Prometheus Architecture
 
-<img src="/images/architecture_prom.png" width="700"/>
+<img src="/images/architecture_prom.png" width="600"/>
 
 ## Prometheus AMPCost Architecture
 
