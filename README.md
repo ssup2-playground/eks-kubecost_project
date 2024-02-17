@@ -17,6 +17,10 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 "Prometheus AWS AMP Cost Architecture" is an architecture that centralizes only cost metrics in AWS AMP. It can be used when you want to visualize the cost of multiple AWS EKS clusters while optimizing the cost of using AWS AMP.
 
+* Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by Prometheus.
+* Kubecost retrieves cost metrics from Prometheus when visualizing cost.
+* Prometheus writes cost metrics to AWS AMP
+
 ## Prometheus AWS AMP Architecture
 
 <img src="/images/architecture_prom_amp.png" width="800"/>
@@ -31,7 +35,7 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 <img src="/images/architecture_adot_amp.png" width="800"/>
 
-"ADOT Collector AWS AMP Architecture" is an architecture in which ADOT collector replaces the metric collection role previously performed by prometheus.
+"ADOT Collector AWS AMP Architecture" is an architecture in which ADOT collector replaces the metric collection role previously performed by Prometheus.
 
 * Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by ADOT collector.
 * ADOT collector writes collected metrics to AWS AMP.
