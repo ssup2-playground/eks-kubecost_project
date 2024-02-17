@@ -6,6 +6,8 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 <img src="/images/architecture_prom.png" width="600"/>
 
+Prometheus Architecture is the most commonly used basic architecture when using kubecost. Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by Prometheus. Additionally, when kubecost retrieves Cost Metric for cost visualization, it also retrieves it from Prometheus.
+
 ## Prometheus AMPCost Architecture
 
 <img src="/images/architecture_prom_ampcost.png" width="800"/>
