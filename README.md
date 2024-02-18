@@ -4,18 +4,19 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 * [aws-terraform](https://github.com/ssup2-playground/eks-kubecost_aws-terraform) : Terraform for EKS clusters, Kubecost and AWS Resources
 
-## Prometheus Architecture
+## Prometheus architecture
 
 <img src="/images/architecture-prom.png" width="600"/>
 
-"Prometheus Architecture" is the most commonly used basic architecture when using kubecost. 
+"Prometheus Architecture" is the most commonly used basic architecture when using kubecost.
 
 * Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by Prometheus.
 * Kubecost retrieves cost metrics from Prometheus when visualizing cost.
 
-### Prometheus Scrapper Setting for Kubecost
+### Prometheus scrapper setting for Kubecost
 
 ```yaml
+# Prometheus Server's prometheus.yml
     scrape_configs:
     - job_name: kubecost
       honor_labels: true
@@ -32,7 +33,6 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
       kubernetes_sd_configs:
         - role: pod
       relabel_configs:
-      # Scrape only the the targets matching the following metadata
         - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
           action: keep
           regex:  kubecost
@@ -43,9 +43,10 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 * "kubecost", "kubecost-networking" job must be set for Kubecost.
 
-### Prometheus Recording Rules for Kubecost
+### Prometheus recording rules for Kubecost
 
 ```yaml
+# Prometheus Server's prometheus.yml
     rules:
       groups:
         - name: CPU
@@ -82,17 +83,31 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 * "CPU", "Savings" recording rules must be set for Kubecost.
 
-## Prometheus AWS AMP Cost Architecture
+## Prometheus AWS AMP cost architecture
 
 <img src="/images/architecture-prom-ampcost.png" width="800"/>
 
-"Prometheus AWS AMP Cost Architecture" is an architecture that centralizes only cost metrics in AWS AMP. It can be used when you want to visualize the cost of multiple AWS EKS clusters while optimizing the cost of using AWS AMP.
+"Prometheus AWS AMP cost Architecture" is an architecture that centralizes only cost metrics in AWS AMP. It can be used when you want to visualize the cost of multiple AWS EKS clusters while optimizing the cost of using AWS AMP.
 
 * Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by Prometheus.
 * Kubecost retrieves cost metrics from Prometheus when visualizing cost.
 * Prometheus writes cost metrics to AWS AMP
 
-## Prometheus AWS AMP Architecture
+### Prometheus remote write setting for write cost metrics to AWS AMP
+
+```yaml
+# Prometheus Server's prometheus.yml
+      remote_write:
+      - url: ${amp_remote_write_endpoint}
+        sigv4:
+          region: ${region}
+        write_relabel_configs:
+        - source_labels: [job]
+          regex: 'kubecost|kubecost-networking'
+          action: keep
+```
+
+## Prometheus AWS AMP architecture
 
 <img src="/images/architecture-prom-amp.png" width="800"/>
 
@@ -102,7 +117,22 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 * Prometheus writes collected metrics to AWS AMP.
 * Kubecost retrieves cost metrics from AWS AMP when visualizing cost.
 
-## ADOT Collector AWS AMP Architecture
+### Kubecost settings for AWS AMP, SigV4 proxy
+
+```yaml
+# Kubecost Helm values
+global:
+  amp:
+    enabled: true
+    sigv4:
+      region: "ap-northeast-2"
+
+sigV4Proxy:
+  region: "ap-northeast-2"
+  host: aps-workspaces.ap-northeast-2.amazonaws.com
+```
+
+## ADOT collector AWS AMP architecture
 
 <img src="/images/architecture-adot-amp.png" width="800"/>
 
@@ -112,6 +142,14 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 * ADOT collector writes collected metrics to AWS AMP.
 * Kubecost retrieves cost metrics from AWS AMP when visualizing cost.
 
+### ADOT collector prometheus receiver setting
+
+* The Prometheus Receiver supports the full set of Prometheus scraping and re-labeling configurations. But must be replace `$` characters with `$$` to avoid having the values replaced with environment variables.
+* References
+  * https://docs.aws.amazon.com/prometheus/latest/userguide/AMP-onboard-ingest-metrics-OpenTelemetry.html#AMP-otel-advanced
+  * https://opentelemetry.io/docs/collector/configuration/#environment-variables
+  * https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/20271
+
 ## AWS AMP Architecture
 
 <img src="/images/architecture-amp.png" width="800"/>
@@ -120,3 +158,5 @@ eks-cicd-dr is prototyping project for testing various architecture with kubecos
 
 * Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by AWS AMP Scrapper.
 * Kubecost retrieves cost metrics from AWS AMP when visualizing cost.
+
+### 
