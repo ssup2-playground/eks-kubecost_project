@@ -150,13 +150,44 @@ sigV4Proxy:
   * https://opentelemetry.io/docs/collector/configuration/#environment-variables
   * https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/20271
 
-## AWS AMP Architecture
+## AWS AMP architecture
 
 <img src="/images/architecture-amp.png" width="800"/>
 
-"AWS AMP Architecture" is an agentless architecture that does not install agents to collect AWS EKS Cluster metrics using AWS AMP's Scrapper
+"AWS AMP Architecture" is an agentless architecture that does not install agents to collect AWS EKS Cluster metrics using AWS AMP's scrapper
 
-* Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by AWS AMP Scrapper.
+* Metrics required for cost calculation in Kubecost and cost metrics provided by Kubecost are collected by AWS AMP scrapper.
 * Kubecost retrieves cost metrics from AWS AMP when visualizing cost.
 
-### 
+### AWS AMP scrapper setting
+
+```yaml
+scrape_configs:
+- job_name: 'kubecost'
+  scrape_interval: 60s
+  scrape_timeout: 60s
+  metrics_path: /metrics
+  scheme: http
+  kubernetes_sd_configs:
+  - role: pod
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+    action: keep
+    regex:  cost-analyzer
+  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+    action: keep
+    regex:  cost-analyzer
+- job_name: 'kubecost-networking'
+  kubernetes_sd_configs:
+  - role: pod
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+    action: keep
+    regex:  kubecost
+  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+    action: keep
+    regex:  network-costs
+```
+
+* AWS AMP Scrapper dosen't support "dns_sd_configs".
+* "kubecost" job must be changed to using "kubernetes_sd_configs".
