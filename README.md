@@ -1,6 +1,6 @@
 # eks-kubecost Project
 
-eks-cicd-dr is prototyping project for testing various architecture with kubecost and AWS EKS.
+eks-kubecost is prototyping project for testing various architecture with kubecost and AWS EKS.
 
 * [aws-terraform](https://github.com/ssup2-playground/eks-kubecost_aws-terraform) : Terraform for EKS clusters, Kubecost and AWS Resources
 
