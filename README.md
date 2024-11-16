@@ -4,6 +4,20 @@ eks-kubecost is prototyping project for testing various architecture with kubeco
 
 * [aws-terraform](https://github.com/ssup2-playground/eks-kubecost_aws-terraform) : Terraform for EKS clusters, Kubecost and AWS Resources
 
+## Install
+
+* Run terraform
+
+```bash
+# Get terraform code
+$ git clone https://github.com/ssup2-playground/eks-kubecost_aws-terraform.git && rm ./eks-kubecost_aws-terraform/terraform.tf
+
+# Run terraform
+$ cd eks-kubecost_aws-terraform
+$ terraform init
+$ terraform apply
+```
+
 ## Prometheus architecture
 
 <img src="/images/architecture-prom.png" width="600"/>
